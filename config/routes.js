@@ -1,10 +1,12 @@
-require('dotenv').config();
+//require('dotenv').config();
 
 const axios = require('axios');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 const { authenticate } = require('./middlewares');
+
+const jwtKey = require('../_secrets/keys').jwtKey;
 
 const db = require('../database/dbConfig.js');
 
@@ -35,6 +37,7 @@ function register(req, res) {
     })
 }
 
+// returns all users in database for testing purposes
 function getUsers(req, res) {
   db('users')
     .then(users => {
@@ -68,7 +71,7 @@ function login(req, res) {
 function getJokes(req, res) {
   axios
     .get(
-      'https://08ad1pao69.execute-api.us-east-1.amazonaws.com/dev/random_ten'
+      'https://safe-falls-22549.herokuapp.com/random_ten'
     )
     .then(response => {
       res.status(200).json(response.data);
@@ -85,7 +88,7 @@ const generateToken = user => {
     username: user.username
   };
 
-  const secret = process.env.JWT_SECRET;
+  const secret = jwtKey;
 
   const options = {
     expiresIn: '1h',
