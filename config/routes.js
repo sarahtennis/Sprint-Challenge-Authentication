@@ -1,6 +1,9 @@
 const axios = require('axios');
+const bcrypt = require('bcryptjs');
 
 const { authenticate } = require('./middlewares');
+
+const db = require('../database/dbConfig.js');
 
 module.exports = server => {
   server.post('/api/register', register);
@@ -10,6 +13,22 @@ module.exports = server => {
 
 function register(req, res) {
   // implement user registration
+  const creds = req.body;
+  const hash = bcrypt.hashSync(creds.password, 14);
+  creds.password = hash;
+
+  db('users')
+    .insert(creds)
+    .then(id => {
+      res.status(201).json({ id: id[0] })
+    })
+    .catch(err => {
+      if(err.errno === 19){
+        res.status(409).json({ message: 'Username already exists' });
+      } else {
+        res.status(500).json({ message: 'Error registering user' });
+      }
+    })
 }
 
 function login(req, res) {
