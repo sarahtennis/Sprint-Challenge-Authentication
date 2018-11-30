@@ -15,6 +15,7 @@ module.exports = server => {
   server.post('/api/register', register);
   server.post('/api/login', login);
   server.get('/api/jokes', authenticate, getJokes);
+  server.get('/api/authenticate', authenticate);
 };
 
 function register(req, res) {
